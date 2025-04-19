@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tasks
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis
+    restart: always
+  celery:
+    build: .
+    command: celery -A celery_worker.celery worker --loglevel=info
+    depends_on:
+      - redis
